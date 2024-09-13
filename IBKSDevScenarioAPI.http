@@ -1,0 +1,6 @@
+@IBKSDevScenarioAPI_HostAddress = http://localhost:5152
+
+GET {{IBKSDevScenarioAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
