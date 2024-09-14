@@ -68,54 +68,46 @@ namespace IBKSDevScenarioAPI.Controllers
             }
         }
 
-        [HttpPut]
-        public IActionResult DeleteApplication(Application application) {
-
-            if (application == null || application.Id == 0)
+        [HttpPut("{id}")]
+        public IActionResult UpdateApplication(int id, [FromBody] Application application)
+        {
+            // Check if the application ID matches the one in the URL
+            if (id != application.Id)
             {
-
-                if (application == null)
-                {
-                    return BadRequest("Application data is invalid.");
-
-                }
-
-                else if (application.Id == 0) {
-
-                    return BadRequest("Application id is invalid.");
-                }
+                return BadRequest("Application ID mismatch.");
             }
+
+            var existingApplication = _context.Application.Find(id);
+            if (existingApplication == null)
+            {
+                return NotFound("Application not found.");
+            }
+
+            // Update the fields of the existing application
+            existingApplication.AppStatus = application.AppStatus;
+            existingApplication.ProjectRef = application.ProjectRef;
+            existingApplication.ProjectName = application.ProjectName;
+            existingApplication.ProjectLocation = application.ProjectLocation;
+            existingApplication.OpenDt = application.OpenDt;
+            existingApplication.StartDt = application.StartDt;
+            existingApplication.CompletedDt = application.CompletedDt;
+            existingApplication.ProjectValue = application.ProjectValue;
+            existingApplication.StatusId = application.StatusId;
+            existingApplication.Notes = application.Notes;
+            existingApplication.Modified = DateTime.UtcNow; // Set the modified date to the current date
+            existingApplication.isDeleted = application.isDeleted;
 
             try
             {
-                var approved_Application = _context.Application.Find(application.Id);
-                if (application == null)
-                {
-                    return NotFound("Application not found.");
-                }
-                approved_Application.AppStatus = application.AppStatus;
-                approved_Application.ProjectRef = application.ProjectRef;
-                approved_Application.ProjectName = application.ProjectName;
-                approved_Application.ProjectLocation = application.ProjectLocation;
-                approved_Application.OpenDt = application.OpenDt;
-                approved_Application.StartDt = application.StartDt;
-                approved_Application.CompletedDt = application.CompletedDt;
-                approved_Application.ProjectValue = application.ProjectValue;
-                approved_Application.StatusId = application.StatusId;
-                approved_Application.Notes = application.Notes;
-                approved_Application.Modified = application.Modified;
-                approved_Application.isDeleted = application.isDeleted;
                 _context.SaveChanges();
-                return Ok("Application details updated.");
+                return Ok("Application updated successfully.");
             }
             catch (Exception ex)
             {
-
-                return BadRequest(ex.Message);
+                return BadRequest($"Error updating application: {ex.Message}");
             }
-
-            
         }
+
 
         [HttpDelete("{id}")]
         public IActionResult DeleteApplication(int id)
