@@ -22,7 +22,7 @@ namespace IBKSDevScenarioAPI.Controllers
         {
             try
             {
-                var inquiries = await _context.Application.ToListAsync();
+                var inquiries = await _context.Inquries.ToListAsync();
                 if (inquiries.Count == 0)
                 {
                     return NotFound("No Inquiries found.");

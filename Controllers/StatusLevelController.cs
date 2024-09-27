@@ -21,7 +21,7 @@ namespace IBKSDevScenarioAPI.Controllers
         {
             try
             {
-                var levels = await _context.Application.ToListAsync();
+                var levels = await _context.StatusLevel.ToListAsync();
                 if (levels.Count == 0)
                 {
                     return NotFound("No Status Level found.");
