@@ -20,6 +20,6 @@ namespace IBKSDevScenarioAPI.Models
         public DateTime? AskedDt { get; set; }
         public DateTime? CompletedDt { get; set; }
 
-
+     
     }
 }

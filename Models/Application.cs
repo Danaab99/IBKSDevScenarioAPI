@@ -36,5 +36,7 @@ namespace IBKSDevScenarioAPI.Models
         public DateTime? Modified { get; set; }
 
         public bool? isDeleted { get; set; }
+
+    
     }
 }

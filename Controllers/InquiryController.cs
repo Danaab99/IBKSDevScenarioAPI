@@ -2,6 +2,7 @@
 using IBKSDevScenarioAPI.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace IBKSDevScenarioAPI.Controllers
 {
@@ -17,11 +18,11 @@ namespace IBKSDevScenarioAPI.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetAllInquiries()
+        public async Task <IActionResult> GetAllInquiries()
         {
             try
             {
-                var inquiries = _context.Inquries.ToList();
+                var inquiries = await _context.Application.ToListAsync();
                 if (inquiries.Count == 0)
                 {
                     return NotFound("No Inquiries found.");
@@ -35,11 +36,11 @@ namespace IBKSDevScenarioAPI.Controllers
             }
         }
         [HttpGet("{id}")]
-        public IActionResult GetInquiry(int id)
+        public async Task<IActionResult> GetInquiry(int id)
         {
             try
             {
-                var inquiry = _context.Inquries.Find(id);
+                var inquiry = await _context.Inquries.FindAsync(id);
                 if (inquiry == null)
                 {
                     return NotFound("Application no found.");
@@ -55,31 +56,29 @@ namespace IBKSDevScenarioAPI.Controllers
         }
 
         [HttpPost]
-        public IActionResult PostInquiry(Inquries inquiry)
+        public async Task<IActionResult> PostInquiry([FromBody] Inquries inquiry)
         {
-            try
+            if (!ModelState.IsValid)
             {
-                _context.Inquries.Add(inquiry); // Ensure 'level' does not have an Id set explicitly
-                _context.SaveChanges();
-                return CreatedAtAction(nameof(GetInquiry), new { id = inquiry.Id }, inquiry);
-
+                return BadRequest(ModelState);  // Sends back a 400 error with details about what went wrong
             }
-            catch (Exception ex)
-            {
 
-                return BadRequest(ex.Message);
-            }
+            _context.Inquries.Add(inquiry);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetInquiry), new { id = inquiry.Id }, inquiry);
         }
 
+
         [HttpPut("{id}")]
-        public IActionResult UpdateInquiry(int id, [FromBody] Inquries updatedInquiry)
+        public async Task<IActionResult> UpdateInquiry(int id, [FromBody] Inquries updatedInquiry)
         {
             if (id != updatedInquiry.Id)
             {
                 return BadRequest("ID mismatch in the URL and the inquiry object.");
             }
 
-            var inquiry = _context.Inquries.Find(id);
+            var inquiry =await _context.Inquries.FindAsync(id);
             if (inquiry == null)
             {
                 return NotFound($"Inquiry with ID {id} not found.");
@@ -98,7 +97,7 @@ namespace IBKSDevScenarioAPI.Controllers
                 inquiry.CompletedDt = updatedInquiry.CompletedDt;
 
                 _context.Inquries.Update(inquiry);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
 
                 return Ok("Inquiry updated successfully.");
             }
@@ -109,9 +108,9 @@ namespace IBKSDevScenarioAPI.Controllers
         }
 
         [HttpDelete("{id}")]
-        public IActionResult DeleteInquiry(int id)
+        public async Task<IActionResult> DeleteInquiry(int id)
         {
-            var inquiry = _context.Inquries.Find(id);
+            var inquiry = await _context.Inquries.FindAsync(id);
             if (inquiry == null)
             {
                 return NotFound($"Inquiry with ID {id} not found.");
@@ -120,7 +119,7 @@ namespace IBKSDevScenarioAPI.Controllers
             try
             {
                 _context.Inquries.Remove(inquiry);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
                 return Ok($"Inquiry with ID {id} deleted successfully.");
             }
             catch (Exception ex)

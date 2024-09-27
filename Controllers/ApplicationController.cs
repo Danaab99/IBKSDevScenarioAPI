@@ -2,6 +2,7 @@
 using IBKSDevScenarioAPI.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace IBKSDevScenarioAPI.Controllers
 {
@@ -17,10 +18,10 @@ namespace IBKSDevScenarioAPI.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetAllApps() {
+        public async Task<IActionResult> GetAllApps() {
             try
             {
-                var applications = _context.Application.ToList();
+                var applications = await _context.Application.ToListAsync();
                 if (applications.Count == 0)
                 {
                     return NotFound("No applications found.");
@@ -35,10 +36,10 @@ namespace IBKSDevScenarioAPI.Controllers
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetApplication(int id) {
+        public async Task<IActionResult> GetApplication(int id) {
             try
             {
-                var application = _context.Application.Find(id);
+                var application = await _context.Application.FindAsync(id);
                 if (application == null)
                 {
                     return NotFound("Application no found.");
@@ -54,11 +55,11 @@ namespace IBKSDevScenarioAPI.Controllers
         }
 
         [HttpPost]
-        public IActionResult PostApplication(Application application) {
+        public async Task<IActionResult> PostApplication(Application application) {
             try
             {
                 _context.Add(application);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
                 return Ok("Application created.");
             }
             catch (Exception ex)
@@ -69,7 +70,7 @@ namespace IBKSDevScenarioAPI.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpdateApplication(int id, [FromBody] Application application)
+        public async Task<IActionResult> UpdateApplication(int id, [FromBody] Application application)
         {
             // Check if the application ID matches the one in the URL
             if (id != application.Id)
@@ -77,7 +78,7 @@ namespace IBKSDevScenarioAPI.Controllers
                 return BadRequest("Application ID mismatch.");
             }
 
-            var existingApplication = _context.Application.Find(id);
+            var existingApplication = await _context.Application.FindAsync(id);
             if (existingApplication == null)
             {
                 return NotFound("Application not found.");
@@ -99,7 +100,7 @@ namespace IBKSDevScenarioAPI.Controllers
 
             try
             {
-                _context.SaveChanges();
+               await  _context.SaveChangesAsync();
                 return Ok("Application updated successfully.");
             }
             catch (Exception ex)
@@ -110,9 +111,9 @@ namespace IBKSDevScenarioAPI.Controllers
 
 
         [HttpDelete("{id}")]
-        public IActionResult DeleteApplication(int id)
+        public async Task<IActionResult> DeleteApplication(int id)
         {
-            var application = _context.Application.Find(id);
+            var application = await _context.Application.FindAsync(id);
             if (application == null)
             {
                 return NotFound($"Application with ID {id} not found.");
@@ -121,7 +122,7 @@ namespace IBKSDevScenarioAPI.Controllers
             try
             {
                 _context.Application.Remove(application);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
                 return Ok($"Application with ID {id} has been deleted.");
             }
             catch (Exception ex)

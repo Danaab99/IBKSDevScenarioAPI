@@ -12,5 +12,7 @@ namespace IBKSDevScenarioAPI.DAL
         public DbSet<StatusLevel> StatusLevel { get; set; }
         public DbSet<Application> Application { get; set; }
         public DbSet<Inquries> Inquries { get; set; }
+
+     
     }
 }
